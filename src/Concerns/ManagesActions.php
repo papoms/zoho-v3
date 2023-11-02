@@ -6,6 +6,7 @@ use com\zoho\crm\api\ParameterMap;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\modules\APIException;
+use com\zoho\crm\api\record\APIException as RecordAPIException;
 use com\zoho\crm\api\record\ActionWrapper;
 use com\zoho\crm\api\record\SuccessResponse;
 use com\zoho\crm\api\record\RecordOperations;
@@ -16,7 +17,7 @@ use com\zoho\crm\api\record\ConvertActionWrapper;
 
 trait ManagesActions
 {
-    public function create(array $args = []): SuccessResponse|array
+    public function create(array $args = []): RecordAPIException|SuccessResponse|array
     {
         $recordOperations = new RecordOperations();
         $bodyWrapper = new BodyWrapper();
@@ -33,23 +34,25 @@ trait ManagesActions
         );
     }
 
-    public function update(Record $record): SuccessResponse|array
+    public function update(Record $record): RecordAPIException|SuccessResponse|array
     {
         $recordOperations = new RecordOperations();
         $request = new BodyWrapper();
         $request->setData([$record]);
+        $trigger = array("workflow");
+        $request->setTrigger($trigger);
 
         return $this->handleActionResponse(
             $recordOperations->updateRecords($this->module_api_name, $request)
         );
     }
 
-    public function deleteRecord(string $record_id): SuccessResponse|array
+    public function deleteRecord(string $record_id): RecordAPIExceptionSuccessResponse|array
     {
         return $this->delete([$record_id]);
     }
 
-    public function delete(array $recordIds): SuccessResponse|array
+    public function delete(array $recordIds): RecordAPIException|SuccessResponse|array
     {
         $recordOperations = new RecordOperations();
         $paramInstance = new ParameterMap();
@@ -75,7 +78,7 @@ trait ManagesActions
         );
     }
 
-    private function handleActionResponse($response): SuccessResponse|array
+    private function handleActionResponse($response): RecordAPIException|SuccessResponse|array
     {
         if ($response != null) {
             if (in_array($response->getStatusCode(), array(204, 304))) {
@@ -91,6 +94,10 @@ trait ManagesActions
                     $actionResponse = $responseHandler->getData()[0];
 
                     if ($actionResponse instanceof SuccessResponse) {
+                        return $actionResponse;
+                    }
+
+                    if ($actionResponse instanceof RecordAPIException) {
                         return $actionResponse;
                     }
                 }
