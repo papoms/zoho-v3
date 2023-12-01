@@ -4,7 +4,7 @@ namespace Asciisd\Zoho\Concerns;
 
 use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\record\ActionWrapper;
-use com\zoho\crm\api\modules\APIException;
+use com\zoho\crm\api\record\APIException;
 use com\zoho\crm\api\record\RecordOperations;
 
 trait ManagesBulkActions
