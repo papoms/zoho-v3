@@ -4,7 +4,7 @@ namespace Asciisd\Zoho\Concerns;
 
 use com\zoho\crm\api\ParameterMap;
 use com\zoho\crm\api\record\Record;
-use com\zoho\crm\api\modules\APIException;
+use com\zoho\crm\api\record\APIException;
 use com\zoho\crm\api\record\GetRecordsParam;
 use com\zoho\crm\api\record\RecordOperations;
 use com\zoho\crm\api\record\SearchRecordsParam;
