@@ -82,6 +82,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Token Persistence Method
+    |--------------------------------------------------------------------------
+    |
+    | The **user** key will be used to store and identify the **tokenstore**
+    | details in the DB or File Storage for token persistence.
+    | use 'db' or 'file' (default)
+    |
+    */
+    'token_persistence_method' => 'file',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Token Persistence Database Table Name
+    |--------------------------------------------------------------------------
+    |
+    | When Using db for token persistence the package will use the default
+    | MySQL Database Connection.
+    | You can change the Table Name here however.
+    |
+    */
+    'token_persistence_tablename' => 'zoho_oauth_tokens',
+
+    /*
+    |--------------------------------------------------------------------------
     | Token Persistence Path
     |--------------------------------------------------------------------------
     |

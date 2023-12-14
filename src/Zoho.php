@@ -6,15 +6,16 @@ use com\zoho\api\logger\Levels;
 use com\zoho\api\logger\LogBuilder;
 use com\zoho\crm\api\UserSignature;
 use com\zoho\crm\api\dc\Environment;
-use com\zoho\crm\api\dc\USDataCenter;
+use com\zoho\crm\api\dc\AUDataCenter;
+use com\zoho\crm\api\dc\CNDataCenter;
 use com\zoho\crm\api\dc\EUDataCenter;
 use com\zoho\crm\api\dc\INDataCenter;
-use com\zoho\crm\api\dc\CNDataCenter;
-use com\zoho\crm\api\dc\AUDataCenter;
+use com\zoho\crm\api\dc\USDataCenter;
 use com\zoho\crm\api\SDKConfigBuilder;
 use com\zoho\crm\api\InitializeBuilder;
-use com\zoho\crm\api\exception\SDKException;
 use com\zoho\api\authenticator\OAuthBuilder;
+use com\zoho\crm\api\exception\SDKException;
+use com\zoho\api\authenticator\store\DBBuilder;
 use com\zoho\api\authenticator\store\FileStore;
 
 class Zoho
@@ -77,10 +78,23 @@ class Zoho
         $environment  = self::$environment ?: self::getDataCenterEnvironment();
         $resourcePath = config('zoho.resourcePath');
         $user         = new UserSignature(config('zoho.current_user_email'));
-        $token_store  = new FileStore(config('zoho.token_persistence_path'));
         $logger       = (new LogBuilder())->level(Levels::ALL)
-                                          ->filePath(config('zoho.application_log_file_path'))
-                                          ->build();
+            ->filePath(config('zoho.application_log_file_path'))
+            ->build();
+
+        if (config('zoho.token_persistence_method') == 'db') {
+            $token_store = (new DBBuilder())
+                ->host(env('DB_HOST', '127.0.0.1'))
+                ->portNumber(env('DB_PORT', '3306'))
+                ->databaseName(env('DB_DATABASE', 'forge'))
+                ->userName(env('DB_USERNAME', 'forge'))
+                ->password(env('DB_PASSWORD', ''))
+                ->tableName(config('zoho.token_persistence_tablename'))
+                ->build();
+        } else {
+            $token_store  = new FileStore(config('zoho.token_persistence_path'));
+        }
+
 
         switch (config('zoho.auth_flow_type')) {
             case 'accessToken':
@@ -130,7 +144,7 @@ class Zoho
 
     public static function getDataCenterEnvironment(): ?Environment
     {
-        if ( ! empty(static::$environment)) {
+        if (!empty(static::$environment)) {
             return static::$environment;
         }
 
