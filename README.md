@@ -93,7 +93,7 @@ use Asciisd\Zoho\Zohoable;
 use Asciisd\Zoho\ZohoManager;
 
 class Invoice extends Zohoable {
-    
+
     // this is your Zoho module API Name
     protected $zoho_module_name = 'Payments';
 
@@ -263,6 +263,68 @@ If you're using zoho.com.cn, add to `.env`:
 ZOHO_ACCOUNTS_URL=https://accounts.zoho.com.cn
 ZOHO_API_BASE_URL=www.zohoapis.com.cn
 ```
+
+## Token Persistence Method
+### File Token Store
+By Default this package uses the FileStore method. This will use a local file to persist and cache the created Tokens.
+The actual file can be defined in the config as
+```
+token_persistence_path
+```
+
+### Database Token Store
+If you want to use a Database to persist the tokens you can change the token_persistence_method in the config file.
+It will use the default MySql Database connection of your application and the default TableName ```zoho_oauth_tokens```.
+
+```
+'token_persistence_method' => 'db',
+```
+in the config file (config/zoho.php)
+
+You can change the table name in the config
+```
+'token_persistence_tablename' => 'zoho_oauth_tokens',
+```
+
+#### Database Table migration
+Here is a migration you can use to create the table with the expected schema.
+```
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('zoho_oauth_tokens', function (Blueprint $table) {
+            $table->string('id', 255)->primary();
+            $table->string('user_mail', 255)->nullable(false);
+            $table->string('client_id', 255)->nullable();
+            $table->string('client_secret', 255)->nullable();
+            $table->string('refresh_token', 255)->nullable();
+            $table->string('access_token', 255)->nullable();
+            $table->string('grant_token', 255)->nullable();
+            $table->string('expiry_time', 20)->nullable();
+            $table->string('redirect_url', 255)->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('zoho_oauth_tokens');
+    }
+};
+```
+
 
 ## Support
 
