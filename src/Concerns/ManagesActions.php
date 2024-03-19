@@ -92,6 +92,26 @@ trait ManagesActions
 
                     if ($actionResponse instanceof SuccessResponse) {
                         return $actionResponse;
+
+                    } else if(! empty($actionResponse)) {
+                        // This is a failure case in which we are getting some errors from Zoho that we need to show on frontend.
+                        if (property_exists($actionResponse, 'status')) {
+                            $status = $actionResponse->getStatus()->getValue();
+                        } else {
+                            $status = 'unknown';
+                        }
+
+                        if (property_exists($actionResponse, 'message')) {
+                            $message = $actionResponse->getMessage()->getValue();
+                        } else {
+                            $message = 'Unknown error';
+                        }
+
+                        $responseArray = [
+                            'status' => $status,
+                            'message' => $message,
+                        ];
+                        return $responseArray;
                     }
                 }
 
