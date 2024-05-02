@@ -14,9 +14,17 @@ trait ManagesRecords
 {
     public function getRecord(string $record_id): Record
     {
-        return $this->handleRecordResponse(
-            (new RecordOperations())->getRecord($record_id, $this->module_api_name)
-        )[0];
+        if(empty($record_id)){
+            logger()->error( "getRecord: Record ID must not be empty or null.\n");
+        }
+        $recordData = (new RecordOperations())->getRecord($record_id, $this->module_api_name);
+
+        // Check if record data is empty or if an error occurred
+        if (empty($recordData) || !is_array($recordData) || !isset($recordData[0])) {
+            logger()->error( "getRecord: Failed to fetch record from Zoho.\n");
+        }
+
+        return $this->handleRecordResponse($recordData)[0];
     }
 
     /**
