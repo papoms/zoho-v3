@@ -107,6 +107,13 @@ trait ManagesActions
                             $message = 'Unknown error';
                         }
 
+                        if (property_exists($actionResponse, 'details')) {
+                            $details = $actionResponse->getDetails();
+                            if (is_array($details)) {
+                                $message .= "\n" . json_encode($details);
+                            }
+                        }
+
                         $responseArray = [
                             'status' => $status,
                             'message' => $message,
